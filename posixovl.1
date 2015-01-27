@@ -17,8 +17,10 @@ filesystems can also be used, though the actual use of doing that remains to
 be discovered.
 .SH Options
 .PP
-If no source directory is given, the target directory specifies both source
-and target (mountpoint), yielding an "overmount".
+If no source directory is given with an \fB-S\fP option, the target directory
+specifies both source and target (mountpoint), yielding an "overmount", whereby
+the contents of the lower filesystem may become inaccessible while the mount is
+active (which may be a good thing, depending on your viewpoint).
 .TP
 \fB\-F\fP
 Disable permission and ownership checks on the lower filesystem. Normally these
@@ -31,6 +33,9 @@ When this option is enabled and a hardlink in the posixovl namespace is
 created, the contents of the file will be replicated in the lower filesystem
 rather than using zero-sized placeholder files. Note that the replicas will not
 be updated later on when editing the inode through posixovl.
+.TP
+\fB\-S\fP \fIsource_dir\fP
+This option may be used to specify an alternate path for the lower directory.
 .SH Supported operations
 .PP
 posixovl will emulate the following calls if the lower filesystem is incapable
