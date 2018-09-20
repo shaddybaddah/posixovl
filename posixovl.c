@@ -12,6 +12,7 @@
 #define _ATFILE_SOURCE 1
 #define _GNU_SOURCE 1
 #define FUSE_USE_VERSION 26
+#include "config.h"
 #include <sys/fsuid.h>
 #include <sys/stat.h>
 #include <sys/statvfs.h>
@@ -32,7 +33,12 @@
 #include <string.h>
 #include <unistd.h>
 #include <asm/unistd.h>
-#include <attr/xattr.h>
+#ifdef HAVE_XATTR_XATTR_H
+#	include <attr/xattr.h>
+#endif
+#ifdef HAVE_SYS_XATTR_H
+#	include <sys/xattr.h>
+#endif
 #include "config.h"
 #ifndef S_IRUGO
 #	define S_IRUGO (S_IRUSR | S_IRGRP | S_IROTH)
