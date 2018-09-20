@@ -32,7 +32,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <asm/unistd.h>
 #ifdef HAVE_XATTR_XATTR_H
 #	include <attr/xattr.h>
 #endif
