@@ -1,3 +1,5 @@
+/* Program that exercises filesystem socket dentries to see if posixovl
+ * properly deals with these. */
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
