@@ -1,3 +1,12 @@
+In general
+==========
+
+Some Linux distributions have posixovl already available. Use their package
+management system if you can. `Repology
+<https://repology.org/project/posixovl/versions>`_ is an aggregation page that
+summarizes who has got what.
+
+
 Installation when using a Git snapshot
 ======================================
 
