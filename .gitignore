@@ -8,6 +8,7 @@ Makefile.in
 /build-aux/
 /config.*
 /configure
+/configure~
 /lntest
 /mount.posixovl
 /socket
