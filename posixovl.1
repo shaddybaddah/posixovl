@@ -8,10 +8,9 @@ posixovl \(em The POSIX Overlay Filesystem
 posixovl provides a filesystem view that supports various POSIX operations
 while using an otherwise incapable lower filesystem. Filesystems of various
 degrees of POSIXness can be utilitzed. VFAT is a common denominator when it
-comes to cross-compatibility, though NTFS \(em its features are unused in
-Linux \(em would be another possibility. Secondly, potent native POSIX-style
-filesystems can also be used, though the actual use of doing that remains to
-be discovered.
+comes to cross-compatibility, though NTFS \(em its features are unused in Linux
+\(em would be another possibility. Native POSIX-capable filesystems can be used
+too, though that seems like an unusual application of posixovl.
 .SH Options
 If no source directory is given with an \fB-S\fP option, the target directory
 specifies both source and target (mountpoint), yielding an "overmount", whereby
