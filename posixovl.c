@@ -195,7 +195,9 @@ static __attribute__((pure)) const char *at(const char *in)
 
 static char *strlcpy(char *dest, const char *src, size_t n)
 {
-	strncpy(dest, src, n);
+	if (n == 0)
+		return dest;
+	strncpy(dest, src, n - 1);
 	dest[n-1] = '\0';
 	return dest;
 }
