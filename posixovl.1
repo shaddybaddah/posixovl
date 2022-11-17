@@ -1,13 +1,10 @@
 .TH posixovl 1 "2010-12-07" "posixovl" "posixovl"
 .SH Name
-.PP
 posixovl \(em The POSIX Overlay Filesystem
 .SH Syntax
-.PP
 \fBmount.posixovl\fP [\fB\-FH\fP] [\fB\-S\fP \fIsource_dir\fP] \fItarget_dir\fP
 [\fB\-\-\fP \fIfuse_opts\fP]
 .SH Description
-.PP
 posixovl provides a filesystem view that supports various POSIX operations
 while using an otherwise incapable lower filesystem. Filesystems of various
 degrees of POSIXness can be utilitzed. VFAT is a common denominator when it
@@ -16,7 +13,6 @@ Linux \(em would be another possibility. Secondly, potent native POSIX-style
 filesystems can also be used, though the actual use of doing that remains to
 be discovered.
 .SH Options
-.PP
 If no source directory is given with an \fB-S\fP option, the target directory
 specifies both source and target (mountpoint), yielding an "overmount", whereby
 the contents of the lower filesystem may become inaccessible while the mount is
@@ -37,7 +33,6 @@ be updated later on when editing the inode through posixovl.
 \fB\-S\fP \fIsource_dir\fP
 This option may be used to specify an alternate path for the lower directory.
 .SH Supported operations
-.PP
 posixovl will emulate the following calls if the lower filesystem is incapable
 of supporting these operations:
 .IP \(bu 4
@@ -62,7 +57,6 @@ Missing suppot:
 .IP \(bu 4
 Case-sensitivity
 .SH Notes
-.PP
 Using posixovl on an already POSIX-behaving filesystem (e.g. XFS) incurs some
 issues, since detecting whether a path is POSIX behaving or not is difficult.
 Hence, the following decision was made:
@@ -99,7 +93,6 @@ recommended:
 .PP
 $ mount -t vfat /dev/hda1 /windows/D -o check=s,shortname=mixed
 .SH Authors
-.PP
 posixovl and this manpage were written by Jan Engelhardt.
 .PP
 Development of posixovl was sponsored by Slax (http://www.slax.org/).
