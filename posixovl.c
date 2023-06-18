@@ -2016,21 +2016,21 @@ int main(int argc, char **argv)
 
 	while ((c = getopt(argc, argv, "1FHS:")) > 0) {
 		switch (c) {
-			case '1':
-				single_threaded = true;
-				break;
-			case 'F':
-				assume_vfat = true;
-				break;
-			case 'H':
-				hardlink_with_copy = true;
-				break;
-			case 'S':
-				root_dir = optarg;
-				break;
-			default:
-				usage(*argv);
-				return EXIT_FAILURE;
+		case '1':
+			single_threaded = true;
+			break;
+		case 'F':
+			assume_vfat = true;
+			break;
+		case 'H':
+			hardlink_with_copy = true;
+			break;
+		case 'S':
+			root_dir = optarg;
+			break;
+		default:
+			usage(*argv);
+			return EXIT_FAILURE;
 		}
 	}
 
