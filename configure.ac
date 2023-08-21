@@ -1,4 +1,4 @@
-AC_INIT([posixovl], [1.3])
+AC_INIT([posixovl], [1.4])
 AC_PREREQ([2.61])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADERS([config.h])
