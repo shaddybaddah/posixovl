@@ -193,7 +193,7 @@ static __attribute__((pure)) const char *at(const char *in)
 	return in + 1;
 }
 
-static char *strlcpy(char *dest, const char *src, size_t n)
+static char *px_strlcpy(char *dest, const char *src, size_t n)
 {
 	if (n == 0)
 		return dest;
@@ -209,7 +209,7 @@ static void __hl_dtoi(char *dest, size_t destsize, const char *src)
 {
 	char *last, *p;
 
-	strlcpy(dest, src, destsize);
+	px_strlcpy(dest, src, destsize);
 	last = dest;
 	while ((p = strstr(last, "/" HL_DNODE_PREFIX)) != NULL)
 		last = p + 1;
@@ -641,7 +641,7 @@ static int hcb_lookup_readdir(const char *dir, const char *name,
 		 * '\0', it must be "/". I am trying to optimize here.
 		 */
 		path[0] = '/';
-		strlcpy(&path[1], name, sizeof(path) - 1);
+		px_strlcpy(&path[1], name, sizeof(path) - 1);
 		ret = strlen(name) + 1;
 	} else {
 		ret = snprintf(path, sizeof(path), "%s/%s", dir, name);
@@ -1251,7 +1251,7 @@ static int hl_promote(const char *l0_path, const struct hcb *orig_info,
 		goto out2;
 	new_info.ll.mode  = S_IFHARDLNK;
 	new_info.ll.nlink = 1;
-	strlcpy(new_info.ll.new_target, l1_path, sizeof(new_info.ll.new_target));
+	px_strlcpy(new_info.ll.new_target, l1_path, sizeof(new_info.ll.new_target));
 	hcb_update(&new_info);
 
 	/* instantiate first link into readdir visibility */
@@ -1369,7 +1369,7 @@ static int hl_instantiate(const char *oldpath, const char *newpath)
 		goto out;
 	cb_new.ll.mode  = S_IFHARDLNK;
 	cb_new.ll.nlink = 1;
-	strlcpy(cb_new.ll.new_target, cb_old.ll.target,
+	px_strlcpy(cb_new.ll.new_target, cb_old.ll.target,
 	        sizeof(cb_new.ll.new_target));
 	if ((ret = hcb_update(&cb_new)) < 0)
 		goto out;
@@ -1644,7 +1644,7 @@ static int posixovl_readlink(const char *path, char *dest, size_t size)
 		return -EINVAL; /* not a symbolic link */
 
 	memset(dest, 0, size);
-	strlcpy(dest, info.ll.target, size);
+	px_strlcpy(dest, info.ll.target, size);
 	return 0;
 }
 
@@ -1780,7 +1780,7 @@ static int posixovl_symlink(const char *oldpath, const char *newpath)
 	info.ll.nlink = 1;
 	info.ll.uid   = ctx->uid;
 	info.ll.gid   = ctx->gid;
-	strlcpy(info.ll.new_target, oldpath, sizeof(info.ll.new_target));
+	px_strlcpy(info.ll.new_target, oldpath, sizeof(info.ll.new_target));
 	if ((ret = hcb_update(&info)) < 0)
 		return ret;
 
