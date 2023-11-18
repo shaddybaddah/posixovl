@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /* Program that exercises hardlinks and mmap, to be used with posixovl. */
 #undef NDEBUG
 

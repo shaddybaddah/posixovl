@@ -1,4 +1,5 @@
 # -*- Makefile -*-
+# SPDX-License-Identifier: MIT
 
 AM_CPPFLAGS            = ${regular_CPPFLAGS}
 AM_CFLAGS              = $(regular_CFLAGS) $(libfuse_CFLAGS)
@@ -9,6 +10,7 @@ sbin_PROGRAMS          = mount.posixovl
 EXTRA_PROGRAMS         = socket lntest
 mount_posixovl_SOURCES = posixovl.c
 mount_posixovl_LDADD   = $(libfuse_LIBS)
+EXTRA_DIST = LICENSE.txt
 
 .PHONY: tarball
 tarball:

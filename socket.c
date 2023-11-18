@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /* Program that exercises filesystem socket dentries to see if posixovl
  * properly deals with these. */
 #include <sys/socket.h>

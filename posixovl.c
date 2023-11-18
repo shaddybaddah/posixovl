@@ -9,6 +9,8 @@
  *	published by the Free Software Foundation; either version 2 of
  *	the License, or (at your option) any later version.
  */
+// SPDX-License-Identifier: GPL-2.0-or-later
+// SPDX-FileCopyrightText: 2013 Jan Engelhardt
 #define _ATFILE_SOURCE 1
 #define _GNU_SOURCE 1
 #define FUSE_USE_VERSION 26
