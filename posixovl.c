@@ -88,13 +88,8 @@
 
 /* Definitions */
 
-#define HCB_PREFIX     ".pxovl."
+#define HCB_PREFIX     ".pxovl._"
 #define HCB_PREFIX_LEN (sizeof(HCB_PREFIX) - 1)
-/*
- * Trailing dots may be eaten, so we need to check some filenames for
- * another variant.
- */
-#define HCB_PREFIX1    ".pxovl"
 
 #define HL_DNODE_PREFIX     ".pxovd."
 #define HL_DNODE_PREFIX_LEN (sizeof(HL_DNODE_PREFIX) - 1)
@@ -661,8 +656,7 @@ static __attribute__((pure)) bool is_resv_name(const char *name)
 {
 	return strncmp(name, HCB_PREFIX, HCB_PREFIX_LEN) == 0 ||
 	       strncmp(name, HL_DNODE_PREFIX, HL_DNODE_PREFIX_LEN) == 0 ||
-	       strncmp(name, HL_INODE_PREFIX, HL_INODE_PREFIX_LEN) == 0 ||
-	       strcmp(name, HCB_PREFIX1) == 0;
+	       strncmp(name, HL_INODE_PREFIX, HL_INODE_PREFIX_LEN) == 0;
 }
 
 static __attribute__((pure)) bool is_resv(const char *path)
@@ -797,6 +791,13 @@ static char *xfrm_to_disk(const char *read_ptr)
 
 	for (next = read_ptr; *next != '\0'; ++next)
 		switch (*next) {
+		/* Detect trailing dots on filename components of the path */
+		/* Add extra for escaping as well as the other spec chars */
+		case '.':
+			if ((*(next + 1) != '\0') && (*(next + 1) != '/')) {
+				++needed;
+				break;
+			}
 		case '\\':
 		case ':':
 		case '*':
@@ -818,7 +819,7 @@ static char *xfrm_to_disk(const char *read_ptr)
 		return NULL;
 
 	do {
-		next = strpbrk(read_ptr, "\\:*?\"<>|");
+		next = strpbrk(read_ptr, "\\:*?\"<>|.");
 		if (next == NULL) {
 			strcpy(out_ptr, read_ptr);
 			out_ptr += strlen(read_ptr);
@@ -827,8 +828,14 @@ static char *xfrm_to_disk(const char *read_ptr)
 			strncpy(out_ptr, read_ptr, next - read_ptr);
 			out_ptr += next - read_ptr;
 		}
-		sprintf(out_ptr, "%%(%02X)", *next);
-		out_ptr += strlen("%(XX)");
+		/* spec char handling is the fall through,         */
+		/* but handle non-trailing dots like regular chars */
+		if ((*next == '.') && (*(next + 1) != '/') && (*(next + 1) != '\0'))
+			*out_ptr++ = '.';
+		else {
+			sprintf(out_ptr, "%%(%02X)", *next);
+			out_ptr += strlen("%(XX)");
+		}
 		read_ptr = next + 1;
 	} while (*read_ptr != '\0');
 
@@ -1130,7 +1137,10 @@ static int posixovl1_getattr(const char *path, struct stat *sb)
 static int posixovl_getxattr(const char *path, const char *name,
     char *value, size_t size)
 {
-	return retcode_int(lgetxattr(at(path), name, value, size));
+	char *xpath = xfrm_to_disk(path);
+	int ret     = retcode_int(lgetxattr(at(xpath), name, value, size));
+	free(xpath);
+	return ret;
 }
 
 static int posixovl1_fgetattr(const char *path, struct stat *sb,
