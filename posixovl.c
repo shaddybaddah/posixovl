@@ -791,8 +791,11 @@ static char *xfrm_to_disk(const char *read_ptr)
 
 	for (next = read_ptr; *next != '\0'; ++next)
 		switch (*next) {
-		/* Detect trailing dots on filename components of the path */
-		/* Add extra for escaping as well as the other spec chars */
+		/* Detect trailing dots on filename components of the path  */
+		/* Add extra for escaping as well as the other spec chars   */
+		/* note: we should not worry about seeing . or ..           */
+		/* components. these should be resolved out of the path     */
+		/* before the syscall                                       */
 		case '.':
 			if ((*(next + 1) != '\0') && (*(next + 1) != '/')) {
 				++needed;
@@ -808,7 +811,6 @@ static char *xfrm_to_disk(const char *read_ptr)
 		case '|':
 			needed += strlen("%(XX)");
 			break;
-		/* Path separator ('/') is not to be encoded! */
 		default:
 			++needed;
 			break;
@@ -1445,7 +1447,8 @@ static int posixovl1_link(const char *oldpath, const char *newpath)
 
 static int posixovl_listxattr(const char *path, char *list, size_t size)
 {
-	return retcode_int(llistxattr(at(path), list, size));
+	char *xpath = xfrm_to_disk(path);
+	return retcode_int(llistxattr(at(xpath), list, size));
 }
 
 static int posixovl_mkdir(const char *path, mode_t mode)
@@ -1670,7 +1673,8 @@ static int posixovl1_readlink(const char *path, char *dest, size_t size)
 
 static int posixovl_removexattr(const char *path, const char *name)
 {
-	return retcode_int(lremovexattr(path, name));
+	char *xpath = xfrm_to_disk(path);
+	return retcode_int(lremovexattr(at(xpath), name));
 }
 
 static int posixovl_rename(const char *oldpath, const char *newpath)
@@ -1755,7 +1759,8 @@ static int posixovl1_rmdir(const char *path)
 static int posixovl_setxattr(const char *path, const char *name,
     const char *value, size_t size, int flags)
 {
-	return retcode_int(lsetxattr(at(path), name, value, size, flags));
+	char *xpath = xfrm_to_disk(path);
+	return retcode_int(lsetxattr(at(xpath), name, value, size, flags));
 }
 
 static int posixovl_statfs(const char *path, struct statvfs *sb)
@@ -1809,10 +1814,8 @@ static int posixovl_symlink(const char *oldpath, const char *newpath)
 
 static int posixovl1_symlink(const char *oldpath, const char *newpath)
 {
-	char *xoldpath = xfrm_to_disk(oldpath);
 	char *xnewpath = xfrm_to_disk(newpath);
-	int ret        = posixovl_symlink(xoldpath, xnewpath);
-	free(xoldpath);
+	int ret        = posixovl_symlink(oldpath, xnewpath);
 	free(xnewpath);
 	return ret;
 }
