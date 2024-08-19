@@ -595,6 +595,18 @@ static int hcb_lookup(const char *path, struct hcb *cb)
 	return 0;
 }
 
+static void hcb_mkittmp(char *dest)
+{
+	char *underscoreFlagPtr = strrchr(dest, '/');
+	underscoreFlagPtr[HCB_PREFIX_LEN] = '~';
+}
+
+static void hcb_mkitnottmp(char *dest)
+{
+	char *underscoreFlagPtr = strrchr(dest, '/');
+	underscoreFlagPtr[HCB_PREFIX_LEN] = '_';
+}
+
 /**
  * hcb_lookup_deref - shortcut for hcb_get_deref()+hcb_put()
  * @path:	virtual path
@@ -915,6 +927,7 @@ static int posixovl_chmod(const char *path, mode_t mode)
 static int posixovl1_chmod(const char *path, mode_t mode)
 {
 	char *xpath = xfrm_to_disk(path);
+	fprintf(stderr, "path _%s_, xpath _%s_\n", (path), xpath);
 	int ret     = posixovl_chmod(xpath, mode);
 	free(xpath);
 	return ret;
@@ -925,6 +938,7 @@ static int posixovl_chown(const char *path, uid_t uid, gid_t gid)
 	struct hcb info;
 	int ret;
 
+	fprintf(stderr, "path _%s_\n", (path));
 	if (is_resv(path))
 		return -ENOENT;
 	ret = hcb_get_deref(path, &info);
@@ -1738,14 +1752,28 @@ static int posixovl1_rename(const char *oldpath, const char *newpath)
 static int posixovl_rmdir(const char *path)
 {
 	struct hcb info;
+	char infopathtmp[PATH_MAX];
 	int ret;
 
 	if (is_resv(path))
 		return -ENOENT;
 	ret = hcb_lookup(path, &info);
-	if (ret == 0 && unlinkat(root_fd, at(info.path), 0) < 0)
-		return -errno;
-	return retcode_int(unlinkat(root_fd, at(path), AT_REMOVEDIR));
+	if (ret == 0) {
+		strcpy(infopathtmp, info.path);
+		hcb_mkittmp(infopathtmp);
+		if (renameat(root_fd, at(info.path), root_fd, at(infopathtmp)) < 0)
+			return -errno;
+	}
+	fprintf(stderr, "%s:%u: info.path _%s_\n", __FILE__, __LINE__, info.path);
+	/* return retcode_int(unlinkat(root_fd, at(path), AT_REMOVEDIR)); */
+	ret = retcode_int(unlinkat(root_fd, at(path), AT_REMOVEDIR));
+	if (ret < 0) {
+		renameat(root_fd, at(infopathtmp), root_fd, at(info.path));
+	} else {
+		unlinkat(root_fd, at(infopathtmp), 0);
+	}
+	fprintf(stderr, "%s:%u: ret _%d_\n", __FILE__, __LINE__, ret);
+	return ret;
 }
 
 static int posixovl1_rmdir(const char *path)
@@ -1892,6 +1920,7 @@ static int posixovl_unlink(const char *path)
 		return -errno;
 
 	if (h_ret == 0) {
+		fprintf(stderr, "%s:%u: path _%s_, info.path _%s_\n", __FILE__, __LINE__, path, info.path);
 		unlinkat(root_fd, at(info.path), 0);
 		if (S_ISHARDLNK(info.ll.mode))
 			hl_drop(info.ll.target);
